@@ -1,0 +1,7 @@
+.eggs
+compspec_ior.egg-info
+*.so
+build
+__pycache__
+env
+dist
