@@ -1,0 +1,17 @@
+{
+  "name": "Compspec IOR Development Environment",
+  "dockerFile": "Dockerfile",
+  "context": "../",
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+  },
+      "extensions": [
+         "ms-vscode.cmake-tools"
+      ]
+    }
+  },
+  "postStartCommand": "git config --global --add safe.directory /workspaces/compspec-ior"
+}

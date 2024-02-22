@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: []
+
+jobs:
+  test:
+    name: Test IOR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Install compspec
+        run: |
+           git clone -b refactor-compspec https://github.com/compspec/compspec /tmp/cs
+           cd /tmp/cs
+           pip install .
+
+      - name: Install compspec-ior
+        run: pip install .
+
+      - name: Test with loading data
+        run: compspec extract ior --ior-load ./examples/test/ior-data.json
+
+      - name: Test Python
+        run: python ./examples/singleton-run.py
+
+  validate-schema:
+    name: Validate schema
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Validate Schema
+        uses: compspec/actions/validate-schema@main
+        with:
+          schema: ./compspec_ior/schema.json
+
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup black linter
+      run: conda create --quiet --name black pyflakes
+
+    - name: Check Spelling
+      uses: crate-ci/typos@7ad296c72fa8265059cc03d1eda562fbdfcd6df2 # v1.9.0
+      with:
+        files: ./docs/getting_started/ ./docs/index.rst
+
+    - name: Lint and format Python code
+      run: |
+        export PATH="/usr/share/miniconda/bin:$PATH"
+        source activate black
+        pip install -r .github/dev-requirements.txt
+        pre-commit run --all-files
